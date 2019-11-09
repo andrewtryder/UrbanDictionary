@@ -86,8 +86,7 @@ class UrbanDictionary(callbacks.Plugin):
             html = utils.web.getUrl(url)
         except utils.web.Error as e:
             self.log.error("ERROR opening {0} message: {1}".format(url, e))
-            irc.reply("ERROR: could not open {0} message: {1}".format(url, e))
-            return
+            irc.error("could not open {0} message: {1}".format(url, e), Raise=True)
         # try parsing json.
         #irc.reply("{0}".format(self._repairjson(html.decode('utf-8'))))
         try:
@@ -96,8 +95,7 @@ class UrbanDictionary(callbacks.Plugin):
             jsondata = json.loads(jsondata)  # odds chars in UD.
         except Exception as e:
             self.log.error("Error parsing JSON from UD: {0}".format(e))
-            irc.reply("ERROR: Failed to parse json data. Check logs for error")
-            return
+            irc.error("Failed to parse json data. Check logs for error", Raise=True)
         # process json.
         results = jsondata.get('result_type')  # exact, no_results, fulltext .
         if not results:
@@ -123,8 +121,7 @@ class UrbanDictionary(callbacks.Plugin):
             output = " | ".join(sorted(set([item['word'] for item in definitions])))  # sorted, unique words.
         # output time.
         if results == "no_results" or len(definitions) == 0:  # NOTHING FOUND.
-            irc.reply("ERROR: '{0}' not defined on UrbanDictionary.".format(optterm))
-            return
+            irc.error("'{0}' not defined on UrbanDictionary.".format(optterm), Raise=True)
         else:  # we have definitions, so we're gonna output.
             # check if we should add tags.
             if args['showTags']:  # display tags.
